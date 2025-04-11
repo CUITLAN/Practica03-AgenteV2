@@ -33,15 +33,25 @@ class BCProblem(Problem):
 
     #Calcula la heuristica del nodo en base al problema planteado (Se necesita reimplementar)
     def Heuristic(self, node):
-        #TODO: heurística del nodo
-        print("Aqui falta ncosas por hacer :) ")
-        return 0
+        #Hecho: heurística del nodo (usada distancia Manhattan)
+        return abs(self.goal.x - node.x) + abs(self.goal.y - node.y)
 
     #Genera la lista de sucesores del nodo (Se necesita reimplementar)
     def GetSucessors(self, node):
         successors = []
-        #TODO: sucesores de un nodo dado
-        print("Aqui falta ncosas por hacer :) ")
+        directions = [(-1,0), (1,0), (0,-1), (0,1)]
+
+        for dx, dy in directions:
+            new_x = node.x + dx
+            new_y = node.y + dy
+
+            if 0 <= new_x < self.xSize and 0 <= new_y < self.ySize:
+                value = self.map[new_x][new_y]
+                if BCProblem.CanMove(value):
+                    self.CreateNode(successors, node, new_x, new_y)
+
+        #Hecho sucesores de un nodo dado
+        #TODO revisar porque nose si aqui habría que ver el coste
         return successors
     
     #métodos estáticos
@@ -93,8 +103,23 @@ class BCProblem(Problem):
     #se utiliza para calcular el coste de cada elemento del mapa 
     @staticmethod
     def GetCost(value):
-        #TODO: debes darle un coste a cada tipo de casilla del mapa.
-        return sys.maxsize
+        #Hecho: debes darle un coste a cada tipo de casilla del mapa.
+        if value == AgentConsts.NOTHING:
+            return 1
+        elif value in [AgentConsts.UNBREAKABLE, AgentConsts.PLAYER, AgentConsts.OTHER]:
+            return sys.maxsize
+        elif value == AgentConsts.BRICK:
+            return 3
+        elif value == AgentConsts.COMMAND_CENTER:
+            return 0.5
+        elif value in [AgentConsts.SEMI_BREKABLE, AgentConsts.SEMI_UNBREKABLE]:
+            return 4
+        elif value == AgentConsts.SHELL:
+            return 2
+        elif value == AgentConsts.LIFE:
+            return 0.3
+        else:
+            return sys.maxsize
     
     #crea un nodo y lo añade a successors (lista) con el padre indicado y la posición x,y en coordenadas mapa 
     def CreateNode(self,successors,parent,x,y):

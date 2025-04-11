@@ -17,11 +17,18 @@ class GoalMonitor:
 
     #determina si necesitamos replanificar
     def NeedReplaning(self, perception, map, agent):
+        currentTime = perception[AgentConsts.TIME]
         if self.recalculate:
             self.lastTime = perception[AgentConsts.TIME]
             return True
-        #TODO definir la estrategia de cuando queremos recalcular
-        #puede ser , por ejemplo cada cierto tiempo o cuanod tenemos poca vida.
+        if perception[AgentConsts.LIFE] < 2:
+            self.lastTime = perception[AgentConsts.TIME]
+            return True
+        
+        if currentTime - self.lastTime > 10:
+            self.lastTime = perception[AgentConsts.TIME]
+            return True
+        
         return False
     
     #selecciona la meta mas adecuada al estado actual
