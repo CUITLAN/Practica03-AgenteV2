@@ -3,7 +3,5 @@ from BaseAgent import BaseAgent
 from GoalOrientedAgent import GoalOrientedAgent
 
 
-agent = GoalOrientedAgent("1","Isma")
+agent = GoalOrientedAgent("1","GarlocK")
 agentLoop(agent,True)
-
- 

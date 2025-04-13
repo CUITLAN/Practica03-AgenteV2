@@ -18,7 +18,7 @@ class Attack(State):
     def Transit(self,perception, map):
         target = perception[self.directionToLook]
         #si mi target ya no está vuelvo a ExecutePlan
-        if target != AgentConsts.PLAYER or target != AgentConsts.COMMAND_CENTER:
+        if target != AgentConsts.PLAYER and target != AgentConsts.COMMAND_CENTER:
             return "ExecutePlan"
         return self.id
     
