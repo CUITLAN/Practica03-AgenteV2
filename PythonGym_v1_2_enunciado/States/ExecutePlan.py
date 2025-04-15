@@ -1,7 +1,7 @@
 from StateMachine.State import State
 from States.AgentConsts import AgentConsts
 from MyProblem.BCProblem import BCProblem
-
+from AStar.AStar import AStar
 
 class ExecutePlan(State):
 
@@ -18,6 +18,7 @@ class ExecutePlan(State):
         self.noMovements = 0
 
     def Update(self, perception, map, agent):
+        print("Estoy en ExecutePlan")
         shot = False
         move = self.lastMove
         xW = perception[AgentConsts.AGENT_X]
@@ -56,6 +57,7 @@ class ExecutePlan(State):
 
     def Transit(self,perception, map):
         if self.transition != None and self.transition != "":
+            print("Error con la Transicioness")
             return self.transition
         elif self.noMovements > 5:
             return "Random"
@@ -113,14 +115,19 @@ class ExecutePlan(State):
 
     def GetDirection(self, node, x, y):
         if ExecutePlan.MoveDown(node,x,y):# me muevo hacia abajo
+            print("Me muevo hacia abajo")
             return AgentConsts.MOVE_DOWN
         elif ExecutePlan.MoveUp(node,x,y):# me muevo hacia abajo
+            print("Me muevo arriba posmopnspooa- - - -- - - - -")
             return AgentConsts.MOVE_UP
         elif ExecutePlan.MoveRight(node,x,y):# me muevo hacia abajo
+            print("Me muevo a la derecha")
             return AgentConsts.MOVE_RIGHT
         elif ExecutePlan.MoveLeft(node,x,y):# me muevo hacia abajo
+            print("Me muevo a la Izquierda")
             return AgentConsts.MOVE_LEFT
         else:
+            print("No me muevo un carajo")
             return AgentConsts.NO_MOVE
             #me muevo en la dirección donde haya mas diferencia
 

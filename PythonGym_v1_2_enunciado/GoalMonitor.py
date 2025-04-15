@@ -20,6 +20,7 @@ class GoalMonitor:
         currentTime = perception[AgentConsts.TIME]
         if self.recalculate:
             self.lastTime = perception[AgentConsts.TIME]
+            self.recalculate = False
             return True
         if perception[AgentConsts.LIFE] < 2:
             self.lastTime = perception[AgentConsts.TIME]
@@ -33,9 +34,15 @@ class GoalMonitor:
     
     #selecciona la meta mas adecuada al estado actual
     def SelectGoal(self, perception, map, agent):
-        #TODO definir la estrategia del cambio de meta
-        print("TODO aqui faltan cosas :)")
-        return self.goals[random.randint(0,len(self.goals))]
+    # Calcular distancias Manhattan
+        dist_player = abs(perception[AgentConsts.AGENT_X] - perception[AgentConsts.PLAYER_X]) + \
+                  abs(perception[AgentConsts.AGENT_Y] - perception[AgentConsts.PLAYER_Y])
+    
+        # Calcular distancia Manhattan al command center
+        dist_cc = abs(perception[AgentConsts.AGENT_X] - perception[AgentConsts.COMMAND_CENTER_X]) + \
+                abs(perception[AgentConsts.AGENT_Y] - perception[AgentConsts.COMMAND_CENTER_Y])
+        # Elegir la meta más cercana (player=índice 2, command_center=índice 0)
+        return self.goals[2] if dist_player < dist_cc else self.goals[0]
     
     def UpdateGoals(self,goal, goalId):
         self.goals[goalId] = goal

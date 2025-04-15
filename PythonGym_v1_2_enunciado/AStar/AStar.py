@@ -1,55 +1,62 @@
+from typing import List, Optional
+from .Problem import Problem
+from .Node import Node  # Asegúrate de que esta importación sea correcta
 
-
-#Algoritmo A* genérico que resuelve cualquier problema descrito usando la plantilla de la
-#la calse Problem que tenga como nodos hijos de la clase Node
 class AStar:
-
-    def __init__(self, problem):
-        self.open = [] # lista de abiertos o frontera de exploración
-        self.precessed = set() # set, conjunto de cerrados (más eficiente que una lista)
-        self.problem = problem #problema a resolver
+    def __init__(self, problem: Problem):
+        self.open: List[Node] = []          # Lista de nodos abiertos (type hint)
+        self.processed: set[Node] = set()   # Conjunto de nodos procesados
+        self.problem: Problem = problem     # Tipo Problem
 
     def GetPlan(self):
-        findGoal = False
-        #TODO implementar el algoritmo A*
-        #cosas a tener en cuenta:
-        #Si el número de sucesores es 0 es que el algoritmo no ha encontrado una solución, devolvemos el path vacio []
-        #Hay que invertir el path para darlo en el orden correcto al devolverlo (path[::-1])
-        #GetSucesorInOpen(sucesor) nos devolverá None si no lo encuentra, si lo encuentra
-        #es que ese sucesor ya está en la frontera de exploración, DEBEMOS MIRAR SI EL NUEVO COSTE ES MENOR QUE EL QUE TENIA ALMACENADO
-        #SI esto es asi, hay que cambiarle el padre y setearle el nuevo coste.
-        self.open.clear()
-        self.precessed.clear()
+    #TODO implementar A*
+        self.open = []
+        self.processed = set()
         self.open.append(self.problem.Initial())
-        path = []
-        #mientras no encontremos la meta y haya elementos en open....
-        #TODO implementar el bucle de búsqueda del algoritmo A*
-        return path
-
-    #nos permite configurar un nodo (node) con el padre y la nueva G
-    def _ConfigureNode(self, node, parent, newG):
+        
+        while self.open:
+            # Selecciona el nodo con menor costo F
+            current = min(self.open, key=lambda node: node.F())
+            self.open.remove(current)
+            
+            # Verifica si es la meta (sin paréntesis)
+            if current == self.problem.goal:
+                return self.ReconstructPath(current)
+            
+            self.processed.add(current)
+            successors = self.problem.GetSucessors(current)
+            
+            for successor in successors:
+                if successor in self.processed:
+                    continue
+                
+                new_g = current.G() + self.problem.GetGCost(successor)
+                existing = next((n for n in self.open if n == successor), None)
+                
+                if not existing:
+                    self._ConfigureNode(successor, current, new_g)
+                    self.open.append(successor)
+                elif new_g < existing.G():
+                    self._ConfigureNode(existing, current, new_g)
+        
+        return []  # No hay ruta
+       
+    def _ConfigureNode(self, node: Node, parent: Node, newG: float) -> None:
         node.SetParent(parent)
         node.SetG(newG)
-        #TODO Setearle la heuristica que está implementada en el problema. (si ya la tenía será la misma pero por si reutilizais este método para otras cosas)
+        node.SetH(self.problem.Heuristic(node))  # Heurística calculada
 
-    #nos dice si un sucesor está en abierta. Si esta es que ya ha sido expandido y tendrá un coste, comprobar que le nuevo camino no es más eficiente
-    #En caso de serlos, _ConfigureNode para setearle el nuevo padre y el nuevo G, asi como su heurística
-    def GetSucesorInOpen(self,sucesor):
-        i = 0
-        found = None
-        while found == None and i < len(self.open):
-            node = self.open[i]
-            i += 1
+    def GetSucesorInOpen(self, sucesor: Node) -> Optional[Node]:
+        for node in self.open:
             if node == sucesor:
-                found = node
-        return found
+                return node
+        return None
 
-
-    #reconstruye el path desde la meta encontrada.
     def ReconstructPath(self, goal):
+        #TOdo
         path = []
-        #TODO: devuelve el path invertido desde la meta hasta que el padre sea None.
-        return path
-
-
-
+        current = goal
+        while current is not None:
+            path.append(current)
+            current = current.GetParent()
+        return path[::-1]
