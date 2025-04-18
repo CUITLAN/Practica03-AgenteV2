@@ -57,10 +57,8 @@ class GoalOrientedAgent(BaseAgent):
         goal3Player = self._CreatePlayerGoal(perception)
         self.goalMonitor.UpdateGoals(goal3Player,2)
         if self.goalMonitor.NeedReplaning(perception,map,self):
-            print(f"📍 Meta actual: {self.problem.goal}")  # Log de la meta anterior
             self.problem.InitMap(map) ## refrescamos el mapa
             self.plan=self._CreatePlan(perception, map)
-            print(f"🆕 Nueva meta: {self.problem.goal}")  # Log de la nueva meta
 
         return action, shot
     
@@ -106,15 +104,17 @@ class GoalOrientedAgent(BaseAgent):
         # Crear nodo inicial y metas
         initial_node = self._CreateInitialNode(perception)
         goal_cc = self._CreateDefaultGoal(perception)
+        goal_life = self._CreateLifeGoal(perception)
         goal_player = self._CreatePlayerGoal(perception)
         
         # Inicializar problema y A*
         self.problem = BCProblem(initial_node, goal_cc, 15, 15)
         self.problem.InitMap(map)
         self.aStar = AStar(self.problem)
+        self.aStar.heuristic = self.problem.Heuristic(initial_node)
         
         # Configurar GoalMonitor
-        self.goalMonitor = GoalMonitor(self.problem, [goal_cc, None, goal_player])
+        self.goalMonitor = GoalMonitor(self.problem, [goal_cc, goal_life, goal_player])
         self.plan = self._CreatePlan(perception, map)
         #muestra un plan por consola
     @staticmethod
